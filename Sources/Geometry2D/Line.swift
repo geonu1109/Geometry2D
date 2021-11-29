@@ -19,6 +19,11 @@ public struct Line {
         self.yIntercept = yIntercept
     }
     
+    public init(slope: Double, passThrough point: Point) {
+        self.slope = slope
+        self.yIntercept = point.y - slope * point.x
+    }
+    
     public init(passThrough point1: Point, and point2: Point) {
         let slope = (point2.y - point1.y) / (point2.x - point1.x)
         let yIntercept = point2.y - slope * point2.x
