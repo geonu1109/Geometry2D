@@ -3,17 +3,35 @@ import Foundation
 public protocol GeometricObject: Equatable {
     var clone: Self { get }
     
-    mutating func scale(by vector: Vector)
-    
-    mutating func translate(by vector: Vector)
-    
-    mutating func range(from minimumPosition: Vector, to maximumPosition: Vector)
+    mutating func commit(_ mutation: (inout Vector) -> Void)
 }
 
 public extension GeometricObject {
     static var tolerance: Double {
         return .ulpOfOne * 8
     }
+    
+    mutating func scale(by vector: Vector) {
+        self.commit { (point) in
+            point.x *= vector.x
+            point.y *= vector.y
+        }
+    }
+    
+    mutating func translate(by vector: Vector) {
+        self.commit { (point) in
+            point.x += vector.x
+            point.y += vector.y
+        }
+    }
+    
+    mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
+        self.commit { (point) in
+            point.x = min(maximumPosition.x, max(minimumPosition.x, point.x))
+            point.y = min(maximumPosition.y, max(minimumPosition.y, point.y))
+        }
+    }
+    
     
     mutating func scale(by scalarValue: Double) {
         self.scale(by: .init(x: scalarValue, y: scalarValue))
@@ -61,19 +79,8 @@ extension Vector: GeometricObject {
         return self
     }
     
-    public mutating func scale(by vector: Vector) {
-        self.x *= vector.x
-        self.y *= vector.y
-    }
-    
-    public mutating func translate(by vector: Vector) {
-        self.x += vector.x
-        self.y += vector.y
-    }
-    
-    public mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
-        self.x = min(maximumPosition.x, max(minimumPosition.x, self.x))
-        self.y = min(maximumPosition.y, max(minimumPosition.y, self.y))
+    public mutating func commit(_ mutation: (inout Vector) -> Void) {
+        mutation(&self)
     }
 }
 
@@ -86,16 +93,8 @@ extension Point: GeometricObject {
         return self
     }
     
-    public mutating func scale(by vector: Vector) {
-        self.position.scale(by: vector)
-    }
-    
-    public mutating func translate(by vector: Vector) {
-        self.position.translate(by: vector)
-    }
-    
-    public mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
-        self.position.range(from: minimumPosition, to: maximumPosition)
+    public mutating func commit(_ mutation: (inout Vector) -> Void) {
+        self.position.commit(mutation)
     }
 }
 
@@ -111,25 +110,11 @@ extension Square: GeometricObject {
         return self
     }
     
-    public mutating func scale(by vector: Vector) {
-        self.firstVertex.scale(by: vector)
-        self.secondVertex.scale(by: vector)
-        self.thirdVertex.scale(by: vector)
-        self.fourthVertex.scale(by: vector)
-    }
-    
-    public mutating func translate(by vector: Vector) {
-        self.firstVertex.translate(by: vector)
-        self.secondVertex.translate(by: vector)
-        self.thirdVertex.translate(by: vector)
-        self.fourthVertex.translate(by: vector)
-    }
-    
-    public mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
-        self.firstVertex.range(from: minimumPosition, to: maximumPosition)
-        self.secondVertex.range(from: minimumPosition, to: maximumPosition)
-        self.thirdVertex.range(from: minimumPosition, to: maximumPosition)
-        self.fourthVertex.range(from: minimumPosition, to: maximumPosition)
+    public mutating func commit(_ mutation: (inout Vector) -> Void) {
+        self.firstVertex.commit(mutation)
+        self.secondVertex.commit(mutation)
+        self.thirdVertex.commit(mutation)
+        self.fourthVertex.commit(mutation)
     }
 }
 
@@ -142,16 +127,15 @@ extension Line: GeometricObject {
         return self
     }
     
-    public func scale(by vector: Vector) {
-        // do nothing
-    }
-    
-    public mutating func translate(by vector: Vector) {
-        self.yIntercept += vector.y - self.slope * vector.x
+    public mutating func commit(_ mutation: (inout Vector) -> Void) {
+        var xInterceptPosition: Vector = .init(x: self.xIntercept, y: 0)
+        var yInterceptPosition: Vector = .init(x: 0, y: self.yIntercept)
+        mutation(&xInterceptPosition)
+        mutation(&yInterceptPosition)
+        self = .init(passThrough: .init(position: xInterceptPosition), and: .init(position: xInterceptPosition))
     }
     
     public mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
         // do nothing
     }
-    
 }
