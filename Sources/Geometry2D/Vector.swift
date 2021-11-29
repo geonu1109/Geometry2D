@@ -1,13 +1,7 @@
 import Foundation
 import Angle
 
-public struct Vector: Equatable {
-    public static let tolerance: Double = .ulpOfOne * 8
-    
-    public static func == (lhs: Vector, rhs: Vector) -> Bool {
-        return abs(rhs.x - lhs.x) < self.tolerance && abs(rhs.y - lhs.y) < self.tolerance
-    }
-    
+public struct Vector {
     public var x: Double
     public var y: Double
     

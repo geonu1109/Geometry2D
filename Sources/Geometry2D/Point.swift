@@ -1,11 +1,7 @@
 import Foundation
 import Angle
 
-public struct Point: Equatable {
-    public static func == (lhs: Point, rhs: Point) -> Bool {
-        return lhs.position == rhs.position
-    }
-    
+public struct Point {
     public var position: Vector
     
     public var x: Double {
