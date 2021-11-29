@@ -18,29 +18,14 @@ public extension GeometricObject {
         }
     }
     
-    mutating func translate(by vector: Vector) {
-        self.commit { (point) in
-            point.x += vector.x
-            point.y += vector.y
-        }
-    }
-    
-    mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
-        self.commit { (point) in
-            point.x = min(maximumPosition.x, max(minimumPosition.x, point.x))
-            point.y = min(maximumPosition.y, max(minimumPosition.y, point.y))
-        }
-    }
-    
-    
-    mutating func scale(by scalarValue: Double) {
-        self.scale(by: .init(x: scalarValue, y: scalarValue))
-    }
-    
     func scaled(by scalarValue: Double) -> Self {
         var newObject = self.clone
         newObject.scale(by: scalarValue)
         return newObject
+    }
+    
+    mutating func scale(by scalarValue: Double) {
+        self.scale(by: .init(x: scalarValue, y: scalarValue))
     }
     
     func scaled(by vector: Vector) -> Self {
@@ -49,10 +34,24 @@ public extension GeometricObject {
         return newObject
     }
     
+    mutating func translate(by vector: Vector) {
+        self.commit { (point) in
+            point.x += vector.x
+            point.y += vector.y
+        }
+    }
+    
     func translated(by vector: Vector) -> Self {
         var newObject = self.clone
         newObject.translate(by: vector)
         return newObject
+    }
+    
+    mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
+        self.commit { (point) in
+            point.x = min(maximumPosition.x, max(minimumPosition.x, point.x))
+            point.y = min(maximumPosition.y, max(minimumPosition.y, point.y))
+        }
     }
     
     func ranged(from minimumPosition: Vector, to maximumPosition: Vector) -> Self {
