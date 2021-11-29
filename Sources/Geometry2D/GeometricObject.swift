@@ -132,3 +132,26 @@ extension Square: GeometricObject {
         self.fourthVertex.range(from: minimumPosition, to: maximumPosition)
     }
 }
+
+extension Line: GeometricObject {
+    public static func == (lhs: Line, rhs: Line) -> Bool {
+        return lhs.slope == rhs.slope && lhs.yIntercept == rhs.yIntercept
+    }
+    
+    public var clone: Line {
+        return self
+    }
+    
+    public func scale(by vector: Vector) {
+        // do nothing
+    }
+    
+    public mutating func translate(by vector: Vector) {
+        self.yIntercept += vector.y - self.slope * vector.x
+    }
+    
+    public mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
+        // do nothing
+    }
+    
+}
