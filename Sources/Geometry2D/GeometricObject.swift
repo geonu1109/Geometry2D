@@ -46,6 +46,10 @@ public extension GeometricObject {
     static func * (lhs: Self, rhs: Double) -> Self {
         return lhs.scaled(by: rhs)
     }
+    
+    static func / (lhs: Self, rhs: Double) -> Self {
+        return lhs.scaled(by: 1 / rhs)
+    }
 }
 
 extension Vector: GeometricObject {
