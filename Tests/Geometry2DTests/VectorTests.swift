@@ -15,4 +15,12 @@ final class VectorTests: XCTestCase {
         
         XCTAssertEqual(vector.magnitude, 5)
     }
+    
+    func testMultipliedByScalar() {
+        let vector: Vector = .init(x: 1, y: 2)
+        let scalar: Double = 3
+        let expected: Vector = .init(x: 3, y: 6)
+        let actual: Vector = vector * scalar
+        XCTAssertEqual(expected, actual)
+    }
 }

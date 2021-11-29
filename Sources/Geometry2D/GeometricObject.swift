@@ -15,6 +15,16 @@ public extension GeometricObject {
         return .ulpOfOne * 8
     }
     
+    mutating func scale(by scalarValue: Double) {
+        self.scale(by: .init(x: scalarValue, y: scalarValue))
+    }
+    
+    func scaled(by scalarValue: Double) -> Self {
+        var newObject = self.clone
+        newObject.scale(by: scalarValue)
+        return newObject
+    }
+    
     func scaled(by vector: Vector) -> Self {
         var newObject = self.clone
         newObject.scale(by: vector)
@@ -31,6 +41,10 @@ public extension GeometricObject {
         var newObject = self.clone
         newObject.range(from: minimumPosition, to: maximumPosition)
         return newObject
+    }
+    
+    static func * (lhs: Self, rhs: Double) -> Self {
+        return lhs.scaled(by: rhs)
     }
 }
 
