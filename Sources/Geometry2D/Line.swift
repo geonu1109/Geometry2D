@@ -1,5 +1,9 @@
 import Foundation
 
+public enum LineError: Error {
+    case hasInfiniteSolutions
+}
+
 public struct Line {
     public var slope: Double
     
@@ -13,6 +17,10 @@ public struct Line {
             self.yIntercept = -newValue * self.slope
         }
     }
+    
+    public static let xAxis: Line = .init(slope: 0, yIntercept: 0)
+    
+    public static let yAxis: Line = .init(slope: .infinity, yIntercept: 0)
     
     public init(slope: Double, yIntercept: Double) {
         self.slope = slope
@@ -30,19 +38,36 @@ public struct Line {
         self.init(slope: slope, yIntercept: yIntercept)
     }
     
-    public func pointAt(x: Double) -> Point {
+    public func pointAt(x: Double) throws -> Point? {
+        guard self.slope != .infinity else {
+            throw LineError.hasInfiniteSolutions
+        }
         let y = self.slope * x + self.yIntercept
         return .init(x: x, y: y)
     }
     
-    public func pointAt(y: Double) -> Point {
+    public func pointAt(y: Double) throws -> Point {
+        guard self.slope != .zero else {
+            throw LineError.hasInfiniteSolutions
+        }
         let x = (y - self.yIntercept) / self.slope
         return .init(x: x, y: y)
     }
     
-    public func intersection(with line: Line) -> Point {
+    public func intersection(with line: Line) throws -> Point? {
+        guard self.slope != line.slope else {
+            if self.yIntercept == line.yIntercept {
+                throw LineError.hasInfiniteSolutions
+            } else {
+                return nil
+            }
+        }
         let x = -(line.yIntercept - self.yIntercept) / (line.slope - self.slope)
-        return self.pointAt(x: x)
+        do {
+            return try self.pointAt(x: x)
+        } catch {
+            return try line.pointAt(x: x)
+        }
     }
     
     public func perpendicular(passThrough point: Point) -> Line {
@@ -53,7 +78,7 @@ public struct Line {
     
     public func relativePosition(of point: Point) -> Vector {
         let perpendicular = self.perpendicular(passThrough: point)
-        let footOfPerpendicular = self.intersection(with: perpendicular)
+        let footOfPerpendicular = try! self.intersection(with: perpendicular)!
         return .init(initialPoint: footOfPerpendicular, terminalPoint: point)
     }
 }
