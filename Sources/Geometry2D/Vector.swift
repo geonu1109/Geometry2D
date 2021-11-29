@@ -12,12 +12,20 @@ public struct Vector {
         self.y = y
     }
     
+    public static prefix func - (value: Vector) -> Vector {
+        return .init(x: -value.x, y: -value.y)
+    }
+    
     public static func + (lhs: Vector, rhs: Vector) -> Vector {
         return .init(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
     }
     
     public static func - (lhs: Vector, rhs: Vector) -> Vector {
         return .init(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
+    }
+    
+    public static func * (lhs: Vector, rhs: Double) -> Vector {
+        return .init(x: lhs.x * rhs, y: lhs.y * rhs)
     }
 }
 

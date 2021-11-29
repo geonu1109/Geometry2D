@@ -47,6 +47,32 @@ public extension GeometricObject {
         return newObject
     }
     
+    mutating func reflect(over point: Point) {
+        self.commit { (vector) in
+            let diff = vector - point.position
+            vector = vector - diff * 2
+        }
+    }
+    
+    func reflected(over point: Point) -> Self {
+        var newObject = self.clone
+        newObject.reflect(over: point)
+        return newObject
+    }
+    
+    mutating func reflect(over line: Line) {
+        self.commit { (vector) in
+            let relativePosition = line.relativePosition(of: .init(position: vector))
+            vector = vector - relativePosition * 2
+        }
+    }
+    
+    func reflected(over line: Line) -> Self {
+        var newObject = self.clone
+        newObject.reflect(over: line)
+        return newObject
+    }
+    
     mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
         self.commit { (point) in
             point.x = min(maximumPosition.x, max(minimumPosition.x, point.x))
@@ -127,11 +153,22 @@ extension Line: GeometricObject {
     }
     
     public mutating func commit(_ mutation: (inout Vector) -> Void) {
-        var xInterceptPosition: Vector = .init(x: self.xIntercept, y: 0)
-        var yInterceptPosition: Vector = .init(x: 0, y: self.yIntercept)
-        mutation(&xInterceptPosition)
-        mutation(&yInterceptPosition)
-        self = .init(passThrough: .init(position: xInterceptPosition), and: .init(position: xInterceptPosition))
+        switch self {
+        case let .horizontal(yIntercept):
+            var vector: Vector = .init(x: 0, y: yIntercept)
+            mutation(&vector)
+            self = .horizontal(yIntercept: vector.y)
+        case let .vertical(xIntercept):
+            var vector: Vector = .init(x: xIntercept, y: 0)
+            mutation(&vector)
+            self = .vertical(xIntercept: vector.x)
+        case let .normal(slope, yIntercept):
+            var slopeVector: Vector = .init(x: 1, y: slope)
+            mutation(&slopeVector)
+            var yInterceptVector: Vector = .init(x: 0, y: yIntercept)
+            mutation(&yInterceptVector)
+            self = .init(slope: slope, passThrough: .init(position: yInterceptVector))
+        }
     }
     
     public mutating func range(from minimumPosition: Vector, to maximumPosition: Vector) {
