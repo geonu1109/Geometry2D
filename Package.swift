@@ -16,7 +16,7 @@ let package = Package(
         .package(
             name: "Angle",
             url: "https://github.com/geonu1109/Angle",
-            "1.2.1" ..< "2.0.0"
+            .exact("1.2.2")
         )
     ],
     targets: [
